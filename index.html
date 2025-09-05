@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nextbase CES 2026 - Private Ride Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0056b3; /* Nextbase blue */
+            --secondary: #333333; /* Dark gray */
+            --accent: #ff9800; /* Accent orange */
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #28a745;
+            --danger: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #003a75 100%);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 2.8rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin: 30px auto;
+            overflow: hidden;
+            max-width: 800px;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: var(--light);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-btn {
+            padding: 15px 20px;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .tab-content {
+            padding: 30px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #004494;
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .slot {
+            padding: 15px 10px;
+            text-align: center;
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .slot:hover {
+            background-color: #e9ecef;
+        }
+
+        .slot.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .slot.unavailable {
+            background-color: #f8d7da;
+            color: #721c24;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .booking-summary {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-item.total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .confirmation {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .confirmation i {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        .confirmation h2 {
+            margin-bottom: 15px;
+            color: var(--success);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: 1;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .step.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.8rem;
+        }
+
+        .person-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .person-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .person-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(0, 86, 179, 0.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .tab-btn {
+                padding: 12px 10px;
+                font-size: 14px;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .slot-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .step-label {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .slot-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .person-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-car-side logo-icon"></i>
+                    NEXTBASE
+                </div>
+            </div>
+            <h1>CES 2026 Private Ride Booking</h1>
+            <p class="subtitle">Exclusive transportation service for invited journalists and press members</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="app-container">
+            <div class="tab-nav">
+                <div class="tab-btn active" data-tab="login">Login</div>
+                <div class="tab-btn" data-tab="booking">Booking</div>
+                <div class="tab-btn" data-tab="confirmation">Confirmation</div>
+            </div>
+
+            <div class="tab-content">
+                <!-- Login Tab -->
+                <div class="tab-pane active" id="login">
+                    <h2>Enter Your Invitation Code</h2>
+                    <p>Please enter the unique code you received in your invitation email.</p>
+                    
+                    <div class="form-group">
+                        <label for="invitation-code">Invitation Code</label>
+                        <input type="text" id="invitation-code" placeholder="e.g., NB-CES2026-XXXXX">
+                    </div>
+                    
+                    <button class="btn btn-block" id="verify-code">Verify Code</button>
+                </div>
+
+                <!-- Booking Tab -->
+                <div class="tab-pane" id="booking">
+                    <div class="step-indicator">
+                        <div class="step completed">1</div>
+                        <div class="step active">2</div>
+                        <div class="step">3</div>
+                    </div>
+
+                    <h2>Select Your Ride Details</h2>
+                    
+                    <div class="form-group">
+                        <label>Number of Passengers</label>
+                        <div class="person-selector">
+                            <div class="person-option selected" data-passengers="1">1 Person</div>
+                            <div class="person-option" data-passengers="2">2 People</div>
+                            <div class="person-option" data-passengers="3">3 People</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ride-date">Select Date</label>
+                        <select id="ride-date">
+                            <option value="2026-01-06">January 6, 2026 (Tuesday)</option>
+                            <option value="2026-01-07">January 7, 2026 (Wednesday)</option>
+                            <option value="2026-01-08">January 8, 2026 (Thursday)</option>
+                            <option value="2026-01-09">January 9, 2026 (Friday)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Available Time Slots</label>
+                        <div class="slot-grid">
+                            <div class="slot">8:00 AM</div>
+                            <div class="slot">9:00 AM</div>
+                            <div class="slot unavailable">10:00 AM</div>
+                            <div class="slot">11:00 AM</div>
+                            <div class="slot">12:00 PM</div>
+                            <div class="slot">1:00 PM</div>
+                            <div class="slot">2:00 PM</div>
+                            <div class="slot unavailable">3:00 PM</div>
+                            <div class="slot">4:00 PM</div>
+                            <div class="slot">5:00 PM</div>
+                            <div class="slot">6:00 PM</div>
+                            <div class="slot">7:00 PM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="special-requests">Special Requests (Optional)</label>
+                        <input type="text" id="special-requests" placeholder="E.g., need child seat, extra luggage space">
+                    </div>
+                    
+                    <button class="btn btn-block" id="confirm-booking">Confirm Booking</button>
+                </div>
+
+                <!-- Confirmation Tab -->
+                <div class="tab-pane" id="confirmation">
+                    <div class="confirmation">
+                        <i class="fas fa-check-circle"></i>
+                        <h2>Booking Confirmed!</h2>
+                        <p>Your private ride has been successfully booked.</p>
+                        
+                        <div class="booking-summary">
+                            <h3>Booking Details</h3>
+                            <div class="summary-item">
+                                <span>Date:</span>
+                                <span>January 7, 2026</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Time:</span>
+                                <span>2:00 PM</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Passengers:</span>
+                                <span>2 People</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Confirmation Code:</span>
+                                <span>NB987654321</span>
+                            </div>
+                        </div>
+                        
+                        <p>You will receive a confirmation email and SMS reminder 24 hours before your scheduled pickup.</p>
+                        
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-success">Add to Calendar</button>
+                            <button class="btn">View or Modify Booking</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Nextbase. All rights reserved.</p>
+            
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab navigation
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Show active tab pane
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Verify invitation code
+            document.getElementById('verify-code').addEventListener('click', function() {
+                const code = document.getElementById('invitation-code').value;
+                
+                if (code && code.length > 5) {
+                    // Simulate successful verification
+                    tabBtns[1].click();
+                } else {
+                    alert('Please enter a valid invitation code.');
+                }
+            });
+            
+            // Passenger selection
+            const personOptions = document.querySelectorAll('.person-option');
+            personOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    personOptions.forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Time slot selection
+            const slots = document.querySelectorAll('.slot:not(.unavailable)');
+            slots.forEach(slot => {
+                slot.addEventListener('click', function() {
+                    slots.forEach(s => s.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Confirm booking
+            document.getElementById('confirm-booking').addEventListener('click', function() {
+                const selectedSlot = document.querySelector('.slot.selected');
+                
+                if (selectedSlot) {
+                    tabBtns[2].click();
+                } else {
+                    alert('Please select a time slot for your ride.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
